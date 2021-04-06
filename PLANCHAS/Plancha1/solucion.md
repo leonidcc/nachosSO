@@ -58,30 +58,30 @@
    5. En Machine::ExecInstruction() dentro de machine/mips_sim.cc, puede observarse que NachOS simula 59 instrucciones MIPS.
 
    6. usando la herramienta `grep` podemos listar donde se definen
-   
+
    ```bash
    grep "main(" -rI .
    ```
+   ```bash
+   ./threads/main.cc:main(int argc, char **argv)
+   ./bin/main.c:main(int argc, char *argv[])
+   ./bin/disasm.c:main(int argc, char *argv[])
+   ./bin/fuse/nachosfuse.c:main(int argc, char *argv[])
+   ./bin/fuse/nachosfuse.c:    return fuse_main(argc, argv, &OPERATIONS, NULL);
+   ./bin/coff2noff.c:main(int argc, char *argv[])
+   ./bin/out.c:main(int argc, char *argv[])
+   ./bin/readnoff.c:main(int argc, char *argv[])
+   ./bin/coff2flat.c:main(int argc, char *argv[])
+   ./userland/matmult.c:main(void)
+   ./userland/shell.c:main(void)
+   ./userland/tiny_shell.c:main(void)
+   ./userland/filetest.c:main(void)
+   ./userland/sort.c:main(void)
+   ./userland/touch.c:main(int argc, char *argv[])
+   ./userland/halt.c:main(void)
+   ./userland/echo.c:main(int argc, char *argv[])
    ```
-./threads/main.cc:main(int argc, char **argv)
-./bin/main.c:main(int argc, char *argv[])
-./bin/disasm.c:main(int argc, char *argv[])
-./bin/fuse/nachosfuse.c:main(int argc, char *argv[])
-./bin/fuse/nachosfuse.c:    return fuse_main(argc, argv, &OPERATIONS, NULL);
-./bin/coff2noff.c:main(int argc, char *argv[])
-./bin/out.c:main(int argc, char *argv[])
-./bin/readnoff.c:main(int argc, char *argv[])
-./bin/coff2flat.c:main(int argc, char *argv[])
-./userland/matmult.c:main(void)
-./userland/shell.c:main(void)
-./userland/tiny_shell.c:main(void)
-./userland/filetest.c:main(void)
-./userland/sort.c:main(void)
-./userland/touch.c:main(int argc, char *argv[])
-./userland/halt.c:main(void)
-./userland/echo.c:main(int argc, char *argv[])
-   
-   ```
+
 
    7. A continuación se listan los métodos llamados en la funcion main del direcorio threads, con sus respectivos archivos fuente. Las funciones que se llamen mas de una vez solo aparecen la primera.
 
