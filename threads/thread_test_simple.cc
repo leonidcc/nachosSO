@@ -7,10 +7,17 @@
 
 #include "thread_test_simple.hh"
 #include "system.hh"
+#include "semaphore.hh"
+#include "lib/debug.hh"
+
 
 #include <stdio.h>
 #include <string.h>
 
+#ifdef SEMAPHORE_TEST
+// Initialize semaphore
+Semaphore *sem = new Semaphore("sThreadTestSemaphore", 3);
+#endif
 
 /// Loop 10 times, yielding the CPU to another ready thread each iteration.
 ///
@@ -22,6 +29,12 @@ SimpleThread(void *name_)
     // Reinterpret arg `name` as a string.
     char *name = (char *) name_;
 
+#ifdef SEMAPHORE_TEST
+    DEBUG('s', "Thread \'%s\' make P()\n", name);
+    // Wait
+    sem->P();
+#endif
+
     // If the lines dealing with interrupts are commented, the code will
     // behave incorrectly, because printf execution may cause race
     // conditions.
@@ -29,6 +42,13 @@ SimpleThread(void *name_)
         printf("*** Thread `%s` is running: iteration %u\n", name, num);
         currentThread->Yield();
     }
+
+#ifdef SEMAPHORE_TEST
+    DEBUG('s', "Thread \'%s\' make V()\n", name);
+    // Free
+    sem->V();
+#endif
+
     printf("!!! Thread `%s` has finished\n", name);
 }
 
@@ -39,10 +59,22 @@ SimpleThread(void *name_)
 void
 ThreadTestSimple()
 {
-    char *name = new char [64];
-    strncpy(name, "2nd", 64);
-    Thread *newThread = new Thread(name);
-    newThread->Fork(SimpleThread, (void *) name);
+    char *name2 = new char [64]; strncpy(name2, "2nd", 64);
+    char *name3 = new char [64]; strncpy(name3, "3rd", 64);
+    char *name4 = new char [64]; strncpy(name4, "4th", 64);
+    char *name5 = new char [64]; strncpy(name5, "5th", 64);
+
+    Thread *newThread2 = new Thread(name2);
+    newThread2->Fork(SimpleThread, (void *) name2);
+
+    Thread *newThread3 = new Thread(name3);
+    newThread3->Fork(SimpleThread, (void *) name3);
+
+    Thread *newThread4 = new Thread(name4);
+    newThread4->Fork(SimpleThread, (void *) name4);
+
+    Thread *newThread5 = new Thread(name5);
+    newThread5->Fork(SimpleThread, (void *) name5);
 
     SimpleThread((void *) "1st");
 }
