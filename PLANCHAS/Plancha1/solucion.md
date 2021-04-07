@@ -57,31 +57,28 @@
 
    5. En Machine::ExecInstruction() dentro de machine/mips_sim.cc, puede observarse que NachOS simula 59 instrucciones MIPS.
 
-   6. usando la herramienta `grep` podemos listar donde se definen
+   6. Usando la herramienta `grep` podemos listar donde se definen
 
-   ```bash
-   grep "main(" -rI .
    ```
-   ```bash
-   ./threads/main.cc:main(int argc, char **argv)
-   ./bin/main.c:main(int argc, char *argv[])
-   ./bin/disasm.c:main(int argc, char *argv[])
-   ./bin/fuse/nachosfuse.c:main(int argc, char *argv[])
-   ./bin/fuse/nachosfuse.c:    return fuse_main(argc, argv, &OPERATIONS, NULL);
-   ./bin/coff2noff.c:main(int argc, char *argv[])
-   ./bin/out.c:main(int argc, char *argv[])
-   ./bin/readnoff.c:main(int argc, char *argv[])
-   ./bin/coff2flat.c:main(int argc, char *argv[])
-   ./userland/matmult.c:main(void)
-   ./userland/shell.c:main(void)
-   ./userland/tiny_shell.c:main(void)
-   ./userland/filetest.c:main(void)
-   ./userland/sort.c:main(void)
-   ./userland/touch.c:main(int argc, char *argv[])
-   ./userland/halt.c:main(void)
-   ./userland/echo.c:main(int argc, char *argv[])
+   /threads/main.cc:main(int argc, char **argv)
+   /bin/main.c:main(int argc, char *argv[])
+   /bin/disasm.c:main(int argc, char *argv[])
+   /bin/fuse/nachosfuse.c:main(int argc, char *argv[])
+   /bin/coff2noff.c:main(int argc, char *argv[])
+   /bin/out.c:main(int argc, char *argv[])
+   /bin/readnoff.c:main(int argc, char *argv[])
+   /bin/coff2flat.c:main(int argc, char *argv[])
+   /userland/matmult.c:main(void)
+   /userland/shell.c:main(void)
+   /userland/tiny_shell.c:main(void)
+   /userland/filetest.c:main(void)
+   /userland/sort.c:main(void)
+   /userland/touch.c:main(int argc, char *argv[])
+   /userland/halt.c:main(void)
+   /userland/echo.c:main(int argc, char *argv[])
    ```
-
+  No encontramos, en el directorio userprog un "main" específico.
+  Lo que pudimos observar en el "main" del directorio threads es que se invocan ciertos métodos, dependiendo de el condicional de compilación USER_PROGRAM.
 
    7. A continuación se listan los métodos llamados en la funcion main del direcorio threads, con sus respectivos archivos fuente. Las funciones que se llamen mas de una vez solo aparecen la primera.
 
@@ -188,7 +185,7 @@
 
    13. Básicamente una `SynchList` contiene una instancia de una `List` con la diferencia que `SynchList` es thread safe (bloquea a los threads cuando realiza operaciones).
 
-   14.  en thread_test_simple.cc
+   14. en thread_test_simple.cc
 
    15. en thread_test_simple.cc
 
