@@ -25,12 +25,14 @@
 
 Condition::Condition(const char *debugName, Lock *conditionLock)
 {
-    // TODO
+    name = debugName;
+    lock = conditionLock;
+    semList = new List<Semaphore*>();
 }
 
 Condition::~Condition()
 {
-    // TODO
+    delete semList;
 }
 
 const char *
@@ -42,17 +44,30 @@ Condition::GetName() const
 void
 Condition::Wait()
 {
-    // TODO
+    Semaphore *semWait = new Semaphore(name, 0);
+    semList->Append(semWait);
+
+    lock->Release();
+    semWait->P();
+    lock->Acquire();
+
+    delete semWait;
 }
 
 void
 Condition::Signal()
 {
-    // TODO
+    if(!semList->IsEmpty()) {
+        Semaphore *sigSem = semList->Pop();
+        sigSem->V();
+    }
 }
 
 void
 Condition::Broadcast()
 {
-    // TODO
+    while(!semList->IsEmpty()) {
+        Semaphore *broSem = semList->Pop();
+        broSem->V();
+    }
 }

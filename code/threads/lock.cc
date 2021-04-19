@@ -14,17 +14,24 @@
 /// All rights reserved.  See `copyright.h` for copyright notice and
 /// limitation of liability and disclaimer of warranty provisions.
 
-
+#include "system.hh"
 #include "lock.hh"
 
 
 /// Dummy functions -- so we can compile our later assignments.
 
 Lock::Lock(const char *debugName)
-{}
+{
+    name = debugName;
+    myThread = NULL;
+    sem = new Semaphore(name, 1);
+
+}
 
 Lock::~Lock()
-{}
+{
+    delete sem;
+}
 
 const char *
 Lock::GetName() const
@@ -35,18 +42,21 @@ Lock::GetName() const
 void
 Lock::Acquire()
 {
-    // TODO
+    ASSERT (!IsHeldByCurrentThread());
+    sem->P();
+    myThread = currentThread;
 }
 
 void
 Lock::Release()
 {
-    // TODO
+    ASSERT (IsHeldByCurrentThread());
+    myThread = NULL;
+    sem->V();
 }
 
 bool
 Lock::IsHeldByCurrentThread() const
 {
-    // TODO
-    return false;
+    return myThread == currentThread;
 }

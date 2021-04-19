@@ -19,6 +19,7 @@
 
 
 #include "lock.hh"
+#include "semaphore.hh"
 
 
 /// This class defines a “condition variable”.
@@ -76,7 +77,9 @@ private:
 
     const char *name;
 
-    // Other needed fields are to be added here.
+    // fields added 
+    Lock *lock;
+    List<Semaphore*> *semList;
 };
 
 
