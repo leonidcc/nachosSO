@@ -72,6 +72,9 @@ enum ThreadStatus {
     NUM_THREAD_STATUS
 };
 
+// En algún lado se define si hace falta
+class Channel;
+
 /// The following class defines a “thread control block” -- which represents
 /// a single thread of execution.
 ///
@@ -97,7 +100,7 @@ private:
 public:
 
     /// Initialize a `Thread`.
-    Thread(const char *debugName);
+    Thread(const char *debugName, bool usedJoin = 1);
 
     /// Deallocate a Thread.
     ///
@@ -115,6 +118,9 @@ public:
 
     /// Put the thread to sleep and relinquish the processor.
     void Sleep();
+
+    /// bloquee al llamante hasta que el hilo en cuestión termine.
+    void Join();
 
     /// The thread is done executing.
     void Finish();
@@ -141,6 +147,7 @@ private:
 
     const char *name;
 
+    Channel *channel;
     /// Allocate a stack for thread.  Used internally by `Fork`.
     void StackAllocate(VoidFunctionPtr func, void *arg);
 

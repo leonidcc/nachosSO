@@ -21,6 +21,8 @@
 #include "switch.h"
 #include "system.hh"
 
+#include "channel.hh"
+
 #include <inttypes.h>
 #include <stdio.h>
 
@@ -40,12 +42,16 @@ IsThreadStatus(ThreadStatus s)
 /// `Thread::Fork`.
 ///
 /// * `threadName` is an arbitrary string, useful for debugging.
-Thread::Thread(const char *threadName)
+Thread::Thread(const char *threadName, bool usedJoin)
 {
     name     = threadName;
     stackTop = nullptr;
     stack    = nullptr;
     status   = JUST_CREATED;
+
+    channel =(usedJoin)? new Channel(): nullptr;
+
+
 #ifdef USER_PROGRAM
     space    = nullptr;
 #endif
@@ -160,10 +166,23 @@ Thread::Finish()
 
     DEBUG('t', "Finishing thread \"%s\"\n", GetName());
 
+    // se envia el msj para que continue en el Join
+    if(channel) channel->Send(1);
+
     threadToBeDestroyed = currentThread;
     Sleep();  // Invokes `SWITCH`.
     // Not reached.
 }
+
+
+
+
+void
+Thread::Join(){
+    int  *fin = 0;
+    if(channel) channel->Receive(fin);
+}
+
 
 /// Relinquish the CPU if any other thread is ready to run.
 ///
@@ -197,6 +216,9 @@ Thread::Yield()
 
     interrupt->SetLevel(oldLevel);
 }
+
+
+
 
 /// Relinquish the CPU, because the current thread is blocked waiting on a
 /// synchronization variable (`Semaphore`, `Lock`, or `Condition`).
