@@ -50,8 +50,10 @@ Thread::Thread(const char *threadName, bool usedJoin, unsigned int threadPriorit
     status   = JUST_CREATED;
 
     ASSERT(threadPriority < HIGHER_PRIORITY);
-    priority  = threadPriority; 
+    priority  = threadPriority;
     channel =(usedJoin)? new Channel(): nullptr;
+
+    priorityBackup = HIGHER_PRIORITY + 1;
 
 
 #ifdef USER_PROGRAM
@@ -190,6 +192,30 @@ Thread::GetPriority()
 {
     return priority;
 }
+
+void
+Thread::ChangePriority(unsigned int newPriority)
+{
+    ASSERT(newPriority < HIGHER_PRIORITY );
+    ASSERT(this != currentThread);
+
+    scheduler->ChangePriority(this, newPriority);
+
+    priorityBackup = priority;
+    priority = newPriority;
+}
+
+void
+Thread::RestorePriority()
+{
+    if (priorityBackup > HIGHER_PRIORITY ) {
+        scheduler->ChangePriority(this, priorityBackup);
+
+        priority = priorityBackup;
+        priorityBackup = HIGHER_PRIORITY + 1 ;
+    }
+}
+
 
 /// Relinquish the CPU if any other thread is ready to run.
 ///

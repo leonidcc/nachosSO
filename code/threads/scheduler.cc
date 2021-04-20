@@ -135,6 +135,14 @@ Scheduler::Run(Thread *nextThread)
 #endif
 }
 
+
+void
+Scheduler::ChangePriority(Thread *thread, unsigned int newPriority)
+{
+    readyList[thread->GetPriority()]->Remove(thread);
+    readyList[newPriority]->Append(thread);
+}
+
 /// Print the scheduler state -- in other words, the contents of the ready
 /// list.
 ///

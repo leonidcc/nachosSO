@@ -123,6 +123,10 @@ public:
     void Join();
     unsigned int GetPriority();
 
+
+    void ChangePriority(unsigned int newPriority);
+    void RestorePriority();
+
     /// The thread is done executing.
     void Finish();
 
@@ -150,6 +154,7 @@ private:
 
     Channel *channel;
     unsigned int priority;
+    unsigned int priorityBackup;
 
     /// Allocate a stack for thread.  Used internally by `Fork`.
     void StackAllocate(VoidFunctionPtr func, void *arg);

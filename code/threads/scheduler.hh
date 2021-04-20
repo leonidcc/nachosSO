@@ -40,6 +40,9 @@ public:
     // Print contents of ready list.
     void Print();
 
+    // Permite modificar la prioridad de un thread si es necesario
+    void ChangePriority(Thread *thread, unsigned int newPriority);
+
 private:
 
     // Queue of threads that are ready to run, but not running.
