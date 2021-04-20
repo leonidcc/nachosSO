@@ -42,13 +42,15 @@ IsThreadStatus(ThreadStatus s)
 /// `Thread::Fork`.
 ///
 /// * `threadName` is an arbitrary string, useful for debugging.
-Thread::Thread(const char *threadName, bool usedJoin)
+Thread::Thread(const char *threadName, bool usedJoin, unsigned int threadPriority)
 {
     name     = threadName;
     stackTop = nullptr;
     stack    = nullptr;
     status   = JUST_CREATED;
 
+    ASSERT(threadPriority < HIGHER_PRIORITY);
+    priority  = threadPriority; 
     channel =(usedJoin)? new Channel(): nullptr;
 
 
@@ -183,6 +185,11 @@ Thread::Join(){
     if(channel) channel->Receive(fin);
 }
 
+unsigned int
+Thread::GetPriority()
+{
+    return priority;
+}
 
 /// Relinquish the CPU if any other thread is ready to run.
 ///

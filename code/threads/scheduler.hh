@@ -14,6 +14,7 @@
 #include "thread.hh"
 #include "lib/list.hh"
 
+#define HIGHER_PRIORITY 4
 
 /// The following class defines the scheduler/dispatcher abstraction --
 /// the data structures and operations needed to keep track of which
@@ -42,7 +43,10 @@ public:
 private:
 
     // Queue of threads that are ready to run, but not running.
-    List<Thread*> *readyList;
+    // List<Thread*> *readyList;
+
+    //colas de prioridad
+    List<Thread*> *readyList[HIGHER_PRIORITY];
 
 };
 

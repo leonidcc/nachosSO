@@ -100,7 +100,7 @@ private:
 public:
 
     /// Initialize a `Thread`.
-    Thread(const char *debugName, bool usedJoin = 1);
+    Thread(const char *debugName, bool usedJoin = 1, unsigned int threadPriority = 2);
 
     /// Deallocate a Thread.
     ///
@@ -121,6 +121,7 @@ public:
 
     /// bloquee al llamante hasta que el hilo en cuestión termine.
     void Join();
+    unsigned int GetPriority();
 
     /// The thread is done executing.
     void Finish();
@@ -148,6 +149,8 @@ private:
     const char *name;
 
     Channel *channel;
+    unsigned int priority;
+
     /// Allocate a stack for thread.  Used internally by `Fork`.
     void StackAllocate(VoidFunctionPtr func, void *arg);
 
