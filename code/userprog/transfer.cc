@@ -50,7 +50,7 @@ void WriteBufferToUser(const char *buffer, int userAddress,
     ASSERT(buffer != nullptr);
     ASSERT(byteCount > 0);
 
-    for (int i = 0; i < byteCount; i++) {
+    for (int i = 0; i < (int)byteCount; i++) {
         ASSERT(machine->WriteMem(userAddress++, 1, (int)* buffer++));
     }
 }
