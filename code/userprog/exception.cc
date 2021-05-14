@@ -93,6 +93,8 @@ SyscallHandler(ExceptionType _et)
             int filenameAddr = machine->ReadRegister(4);
             if (filenameAddr == 0) {
                 DEBUG('e', "Error: address to filename string is null.\n");
+                machine->WriteRegister(2, -1);
+                break;
             }
 
             char filename[FILE_NAME_MAX_LEN + 1];
@@ -100,11 +102,17 @@ SyscallHandler(ExceptionType _et)
                                     filename, sizeof filename)) {
                 DEBUG('e', "Error: filename string too long (maximum is %u bytes).\n",
                       FILE_NAME_MAX_LEN);
+                machine->WriteRegister(2, -1);
+                break;
             }
 
             DEBUG('e', "`Create` requested for file `%s`.\n", filename);
-
-             fileSystem->Create(filename,100);
+            if (fileSystem->Create(filename, 1000))
+                machine->WriteRegister(2, 0);
+            else {
+                DEBUG('e', "Error: could not create file `%s`.\n", filename);
+                machine->WriteRegister(2, -1);
+            }
             break;
         }
 
@@ -112,6 +120,8 @@ SyscallHandler(ExceptionType _et)
             int filenameAddr = machine->ReadRegister(4);
             if (filenameAddr == 0) {
                 DEBUG('e', "Error: address to filename string is null.\n");
+                machine->WriteRegister(2, -1);
+                break;
             }
 
             char filename[FILE_NAME_MAX_LEN + 1];
@@ -119,11 +129,27 @@ SyscallHandler(ExceptionType _et)
                                     filename, sizeof filename)) {
                 DEBUG('e', "Error: filename string too long (maximum is %u bytes).\n",
                       FILE_NAME_MAX_LEN);
+              machine->WriteRegister(2, -1);
+              break;
             }
 
             DEBUG('e', "`Remove` requested for file `%s`.\n", filename);
+            if (fileSystem->Remove(filename))
+                 machine->WriteRegister(2, 0);
 
-            fileSystem->Remove(filename);
+             else {
+                 DEBUG('e', "Error: could not remove file `%s`.\n", filename);
+                 machine->WriteRegister(2, -1);
+             }
+             break;
+        }
+
+
+        case SC_EXIT:{
+            int status = machine->ReadRegister(4);
+            DEBUG('e', "`Exit` requested with status %u.\n", status);
+            // currentThread->Finish(status);
+            currentThread->Finish();
             break;
         }
 
