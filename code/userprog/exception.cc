@@ -123,7 +123,7 @@ SyscallHandler(ExceptionType _et)
 
             DEBUG('e', "`Remove` requested for file `%s`.\n", filename);
 
-            fileSystem->Remove(filename,100);
+            fileSystem->Remove(filename);
             break;
         }
 
