@@ -57,7 +57,8 @@ Thread::Thread(const char *threadName, bool usedJoin, unsigned int threadPriorit
 
 
 #ifdef USER_PROGRAM
-    space    = nullptr;
+    space   = nullptr;
+    Files =  new Table<OpenFile*>;
 #endif
 }
 

@@ -145,6 +145,79 @@ SyscallHandler(ExceptionType _et)
         }
 
 
+        case SC_READ:{
+
+            int bufferPointer = machine->ReadRegister(4);
+            if (bufferPointer == 0) {
+                DEBUG('e', "`Error`: buffer pointer is null.\n");
+                machine->WriteRegister(2, -1);
+                break;
+            }
+            int size = machine->ReadRegister(5);
+            if (size <= 0) {
+                DEBUG('e', "`Error`: size zero or negative.\n");
+                machine->WriteRegister(2, -1);
+                break;
+            }
+            OpenFileId id = machine->ReadRegister(6);
+            if (id < 0) {
+                DEBUG('e', "`Error`: OpenFileId negative.\n");
+                machine->WriteRegister(2, -1);
+                break;
+            }
+            char temp[size +1];
+            if(id == CONSOLE_INPUT ){
+                DEBUG('e', "`Read` requested from console input.\n");
+                // implementar leer de la conssola
+                machine->WriteRegister(2, -1);
+            }
+            else{
+                DEBUG('e', "`Read` requested from file with id %u.\n", id);
+                // obtener file abiertos del hilo y leer los datos
+                machine->WriteRegister(2, 0);
+            }
+            break;
+        }
+
+
+        case SC_OPEN: {
+            int filenameAddr = machine->ReadRegister(4);
+            if (filenameAddr == 0){
+                DEBUG('e', "`Error`: address to filename string is null.\n");
+                machine->WriteRegister(2, -1);
+                break;
+            }
+
+            char filename[FILE_NAME_MAX_LEN + 1];
+            if (!ReadStringFromUser(filenameAddr, filename, sizeof filename)) {
+                DEBUG('e', "`Error`: filename string too long (maximum is %u bytes).\n",
+                      FILE_NAME_MAX_LEN);
+                machine->WriteRegister(2, -1);
+                break;
+            }
+
+            DEBUG('e', "`Open` requested for file `%s`.\n", filename);
+
+            OpenFile *file = fileSystem->Open(filename);
+
+            if(file == nullptr){
+                DEBUG('e', "`Error`: could not open file `%s`.\n", filename);
+                 machine->WriteRegister(2, -1);
+                 break;
+            }
+
+            int idFile = currentThread->Files->Add(file);
+            if(idFile == -1) {
+                DEBUG('e', "`Error`:  files table is full.\n");
+                delete file;
+                machine->WriteRegister(2, -1);
+                break;
+            }
+            DEBUG('e', "`Open` finished for file `%s`.\n", filename);
+            machine->WriteRegister(2,idFile);
+            break;
+        }
+
         case SC_EXIT:{
             int status = machine->ReadRegister(4);
             DEBUG('e', "`Exit` requested with status %u.\n", status);
@@ -156,6 +229,21 @@ SyscallHandler(ExceptionType _et)
         case SC_CLOSE: {
             int fid = machine->ReadRegister(4);
             DEBUG('e', "`Close` requested for id %u.\n", fid);
+
+            if (fid < 2) {
+                DEBUG('e', "Error: file id must be greater than or equal to 2.\n");
+                machine->WriteRegister(2, -1);
+                break;
+            }
+            OpenFile *file = currentThread->Files->Remove(fid);
+            if (file != nullptr) {
+                delete file;
+                machine->WriteRegister(2, 0);
+            }
+            else {
+                DEBUG('e', "Error: could not close file with id %u.\n", fid);
+                machine->WriteRegister(2, -1);
+            }
             break;
         }
 

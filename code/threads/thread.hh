@@ -39,6 +39,7 @@
 #define NACHOS_THREADS_THREAD__HH
 
 
+#include "lib/table.hh"
 #include "lib/utility.hh"
 
 #ifdef USER_PROGRAM
@@ -177,6 +178,8 @@ public:
 
     // User code this thread is running.
     AddressSpace *space;
+
+    Table<OpenFile*> *Files;
 #endif
 };
 
