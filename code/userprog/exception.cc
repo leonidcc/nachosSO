@@ -144,6 +144,56 @@ SyscallHandler(ExceptionType _et)
              break;
         }
 
+        case SC_WRITE: {
+                 int userString = machine->ReadRegister(4);
+                 if (userString == 0) {
+                     DEBUG('e', "Error: address to user string is null.\n");
+                     machine->WriteRegister(2, -1);
+                     break;
+                 }
+                 int size = machine->ReadRegister(5);
+                 if (size <= 0) {
+                     DEBUG('e', "Error: size for Write must be greater than 0.\n");
+                     machine->WriteRegister(2, -1);
+                     break;
+                 }
+
+                 OpenFileId fid = machine->ReadRegister (6);
+                 if (fid < 0) {
+                     DEBUG('e', "Error: file id must be greater than or equal to 0.\n");
+                     machine->WriteRegister(2, -1);
+                     break;
+                 }
+
+                 char tempString[size + 1];
+                 ReadBufferFromUser(userString, tempString, size);
+                 tempString[size] = '\0';
+                 int bytesWritten = 0;
+
+                 if (fid == CONSOLE_OUTPUT) {
+                     DEBUG('e', "`Write` requested to console output.\n");
+                     // implementar escribir en la conssola
+                     machine->WriteRegister(2, -1);
+                 }
+                 else {
+                     DEBUG('e', "`Write` requested to file with id %u.\n", fid);
+                     OpenFile *file = currentThread->Files->Get(fid);
+                     if (file != nullptr)
+                         bytesWritten = file->Write(tempString, size);
+                     else {
+                         DEBUG('e', "Error: could not open file with id %u for writting.\n",
+                               fid);
+                         machine->WriteRegister(2, -1);
+                         break;
+                     }
+                 }
+
+                 if (bytesWritten == size)
+                     machine->WriteRegister(2, 0);
+                 else
+                     machine->WriteRegister(2, -1);                     
+                 break;
+             }
 
         case SC_READ:{
 
@@ -166,6 +216,7 @@ SyscallHandler(ExceptionType _et)
                 break;
             }
             char temp[size +1];
+            int bytesRead = 0;
             if(id == CONSOLE_INPUT ){
                 DEBUG('e', "`Read` requested from console input.\n");
                 // implementar leer de la conssola
@@ -174,7 +225,21 @@ SyscallHandler(ExceptionType _et)
             else{
                 DEBUG('e', "`Read` requested from file with id %u.\n", id);
                 // obtener file abiertos del hilo y leer los datos
-                machine->WriteRegister(2, 0);
+                OpenFile *file = currentThread->Files->Get(id);
+
+                if (file != nullptr) {
+                    bytesRead = file->Read(temp, size);
+                    temp[bytesRead] = '\0';
+                    WriteStringToUser(temp, bufferPointer);
+                    machine->WriteRegister(2, bytesRead);
+                    break;
+                }
+                else {
+                    DEBUG('e', "Error: could not open file with id %u for reading.\n",
+                          id);
+                    machine->WriteRegister(2, -1);
+                    break;
+                }
             }
             break;
         }
