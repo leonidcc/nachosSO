@@ -58,8 +58,8 @@ private:
 
     /// For debugging.
     const char *name;
-    Thread *myThread;
     Semaphore *sem;
+    Thread *threadLocking;
 
     // Add other needed fields here.
 };

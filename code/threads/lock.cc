@@ -23,8 +23,8 @@
 Lock::Lock(const char *debugName)
 {
     name = debugName;
-    myThread = NULL;
     sem = new Semaphore(name, 1);
+    threadLocking = nullptr;
 
 }
 
@@ -43,20 +43,28 @@ void
 Lock::Acquire()
 {
     ASSERT (!IsHeldByCurrentThread());
+
+    // if (threadLocking != nullptr && threadLocking->GetPriority() > currentThread->GetPriority()) {
+    //   threadLocking->ChangePriority(currentThread->GetPriority());
+    // }
+
     sem->P();
-    myThread = currentThread;
+    threadLocking = currentThread;
 }
 
 void
 Lock::Release()
 {
     ASSERT (IsHeldByCurrentThread());
-    myThread = NULL;
+
+    // if (threadLocking != nullptr) { threadLocking->RestorePriority(); }
+
+    threadLocking = nullptr;
     sem->V();
 }
 
 bool
 Lock::IsHeldByCurrentThread() const
 {
-    return myThread == currentThread;
+    return threadLocking == currentThread;
 }
