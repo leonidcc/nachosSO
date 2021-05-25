@@ -191,7 +191,7 @@ SyscallHandler(ExceptionType _et)
                  if (bytesWritten == size)
                      machine->WriteRegister(2, 0);
                  else
-                     machine->WriteRegister(2, -1);                     
+                     machine->WriteRegister(2, -1);
                  break;
              }
 
@@ -309,6 +309,12 @@ SyscallHandler(ExceptionType _et)
                 DEBUG('e', "Error: could not close file with id %u.\n", fid);
                 machine->WriteRegister(2, -1);
             }
+            break;
+        }
+
+        case SC_PS: {
+            DEBUG('e', "Print scheduler state\n");
+            scheduler->Print();
             break;
         }
 
