@@ -132,6 +132,11 @@ Close:
         syscall
         j       $31
         .end    Close
+Ps:
+        addiu $2, $0, SC_PS
+        syscall
+        j       $31
+        .end    Ps
 
 /// Dummy function to keep gcc happy.
         .globl  __main

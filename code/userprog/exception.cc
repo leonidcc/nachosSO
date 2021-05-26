@@ -322,6 +322,12 @@ SyscallHandler(ExceptionType _et)
             break;
         }
 
+        case SC_PS: {
+            DEBUG('e', "Print scheduler state\n");
+            scheduler->Print();
+            break;
+        }
+
         default:
             fprintf(stderr, "Unexpected system call: id %d.\n", scid);
             ASSERT(false);
