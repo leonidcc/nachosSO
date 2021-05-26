@@ -172,7 +172,10 @@ SyscallHandler(ExceptionType _et)
 
                  if (fid == CONSOLE_OUTPUT) {
                      DEBUG('e', "`Write` requested to console output.\n");
-                     // implementar escribir en la conssola
+                    //  for (; bytesWritten < size; bytesWritten++) {
+                    //     char ch = tempString[bytesWritten];
+                    //     synchConsole->WriteChar(ch);
+                    // }
                      machine->WriteRegister(2, -1);
                  }
                  else {
@@ -191,7 +194,7 @@ SyscallHandler(ExceptionType _et)
                  if (bytesWritten == size)
                      machine->WriteRegister(2, 0);
                  else
-                     machine->WriteRegister(2, -1);                     
+                     machine->WriteRegister(2, -1);
                  break;
              }
 
@@ -220,6 +223,13 @@ SyscallHandler(ExceptionType _et)
             if(id == CONSOLE_INPUT ){
                 DEBUG('e', "`Read` requested from console input.\n");
                 // implementar leer de la conssola
+                // for (; bytesRead < size; bytesRead++) {
+                //     char ch = synchConsole->ReadChar();
+                //     tempString[bytesRead] = ch;
+                //     if (ch == '\n')
+                //         break;
+                // }
+                // tempString[bytesRead+1] = '\0';
                 machine->WriteRegister(2, -1);
             }
             else{

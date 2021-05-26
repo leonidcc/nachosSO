@@ -46,6 +46,8 @@ extern FileSystem *fileSystem;
 #ifdef FILESYS
 #include "filesys/synch_disk.hh"
 extern SynchDisk *synchDisk;
+#include "filesys/synch_console.hh"
+extern SynchConsole *synchConsole;
 #endif
 
 #ifdef NETWORK
