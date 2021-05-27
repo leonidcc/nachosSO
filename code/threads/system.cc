@@ -12,10 +12,12 @@
 #ifdef USER_PROGRAM
 #include "userprog/debugger.hh"
 #include "userprog/exception.hh"
+
 #endif
 
 #include <stdlib.h>
 #include <string.h>
+
 
 
 /// This defines *all* of the global data structures used by Nachos.
@@ -45,6 +47,8 @@ SynchConsole *synchConsole;
 
 #ifdef USER_PROGRAM  // Requires either *FILESYS* or *FILESYS_STUB*.
 Machine *machine;  ///< User program memory and registers.
+Bitmap *pagesInUse;
+Table<Thread *> *threads;
 #endif
 
 #ifdef NETWORK
@@ -229,6 +233,8 @@ Initialize(int argc, char **argv)
 #ifdef USER_PROGRAM
     Debugger *d = debugUserProg ? new Debugger : nullptr;
     machine = new Machine(d);  // This must come first.
+    pagesInUse = new Bitmap(NUM_PHYS_PAGES);
+    threads = new Table<Thread *>();
     SetExceptionHandlers();
 #endif
 
@@ -261,6 +267,8 @@ Cleanup()
 
 #ifdef USER_PROGRAM
     delete machine;
+    delete pagesInUse;
+    delete threads;
 #endif
 
 #ifdef FILESYS_NEEDED

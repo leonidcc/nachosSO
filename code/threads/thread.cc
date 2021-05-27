@@ -57,8 +57,10 @@ Thread::Thread(const char *threadName, bool usedJoin, unsigned int threadPriorit
 
 
 #ifdef USER_PROGRAM
-    space   = nullptr;
-    Files =  new Table<OpenFile*>;
+    space = nullptr;
+    Files = new Table<OpenFile*>;
+    PID = threads->Add(this);
+    ASSERT(PID != -1);
 #endif
 }
 
@@ -79,6 +81,9 @@ Thread::~Thread()
         SystemDep::DeallocBoundedArray((char *) stack,
                                        STACK_SIZE * sizeof *stack);
     }
+    #ifdef USER_PROGRAM
+    threads->Remove(this->PID);
+    #endif
 }
 
 /// Invoke `(*func)(arg)`, allowing caller and callee to execute
@@ -179,12 +184,9 @@ Thread::Finish()
     // Not reached.
 }
 
-
-
-
 void
 Thread::Join(){
-    int  *fin = 0;
+    int *fin = 0;
     if(channel) channel->Receive(fin);
 }
 

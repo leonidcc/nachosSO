@@ -9,7 +9,6 @@
 #include "address_space.hh"
 #include "executable.hh"
 #include "threads/system.hh"
-
 #include <string.h>
 
 
@@ -30,7 +29,7 @@ AddressSpace::AddressSpace(OpenFile *executable_file)
     numPages = DivRoundUp(size, PAGE_SIZE);
     size = numPages * PAGE_SIZE;
 
-    ASSERT(numPages <= NUM_PHYS_PAGES);
+    ASSERT(numPages <= pagesInUse->CountClear());
       // Check we are not trying to run anything too big -- at least until we
       // have virtual memory.
 
@@ -42,8 +41,8 @@ AddressSpace::AddressSpace(OpenFile *executable_file)
     pageTable = new TranslationEntry[numPages];
     for (unsigned i = 0; i < numPages; i++) {
         pageTable[i].virtualPage  = i;
-          // For now, virtual page number = physical page number.
-        pageTable[i].physicalPage = i;
+        // For now, virtual page number = physical page number.
+        pageTable[i].physicalPage = pagesInUse->Find();
         pageTable[i].valid        = true;
         pageTable[i].use          = false;
         pageTable[i].dirty        = false;
@@ -81,6 +80,9 @@ AddressSpace::AddressSpace(OpenFile *executable_file)
 /// Nothing for now!
 AddressSpace::~AddressSpace()
 {
+    for (unsigned i = 0; i < numPages; i++) {
+        pagesInUse->Clear(pageTable[i].physicalPage);
+    }
     delete [] pageTable;
 }
 
