@@ -29,6 +29,11 @@
 
 #include <stdio.h>
 
+void InitProcess(void *args) {
+    currentThread->space->InitRegisters();
+    currentThread->space->RestoreState();
+    machine->Run();
+}
 
 static void
 IncrementPC()
@@ -142,6 +147,39 @@ SyscallHandler(ExceptionType _et)
                  machine->WriteRegister(2, -1);
              }
              break;
+        }
+
+        case SC_EXEC: {
+            int file_name_addr = machine->ReadRegister(4);
+            char *file_name = new char[FILE_NAME_MAX_LEN + 1];
+            if(!ReadStringFromUser(file_name_addr, file_name, FILE_NAME_MAX_LEN)) {
+                DEBUG('e', "Invalid filename");
+                machine->WriteRegister(2, -1);
+                break;
+            }            
+            OpenFile *exe = fileSystem->Open(file_name);
+            if(exe == nullptr) {
+                DEBUG('e', "File cannot be opened");
+                machine->WriteRegister(2, -1);
+                break;
+            }
+            Thread *t = new Thread(file_name, true, currentThread->GetPriority());
+            AddressSpace *space = new AddressSpace(exe);
+            t->space = space;
+            delete exe;
+            t->Fork(InitProcess, nullptr);
+            machine->WriteRegister(2, t->PID);
+            break;
+        }
+        case SC_JOIN: {
+            SpaceId id = machine->ReadRegister(4);
+            if(!threads->HasKey(id)) {
+                DEBUG('e', "Thread not found");
+                break;
+            }
+            Thread *c = threads->Get(id);
+            c->Join();
+            break;
         }
 
         case SC_WRITE: {
