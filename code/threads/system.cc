@@ -209,9 +209,13 @@ Initialize(int argc, char **argv)
     stats = new Statistics;      // Collect statistics.
     interrupt = new Interrupt;   // Start up interrupt handling.
     scheduler = new Scheduler;   // Initialize the ready queue.
+#ifdef USER_PROGRAM
+    timer = new Timer(TimerInterruptHandler, 0, randomYield); // Start the timer (if needed).
+#else
     if (randomYield) {           // Start the timer (if needed).
         timer = new Timer(TimerInterruptHandler, 0, randomYield);
     }
+#endif
 
     threadToBeDestroyed = nullptr;
 
