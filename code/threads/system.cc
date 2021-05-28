@@ -211,6 +211,8 @@ Initialize(int argc, char **argv)
     scheduler = new Scheduler;   // Initialize the ready queue.
 #ifdef USER_PROGRAM
     timer = new Timer(TimerInterruptHandler, 0, randomYield); // Start the timer (if needed).
+    pagesInUse = new Bitmap(NUM_PHYS_PAGES);
+    threads = new Table<Thread *>();
 #else
     if (randomYield) {           // Start the timer (if needed).
         timer = new Timer(TimerInterruptHandler, 0, randomYield);
@@ -237,8 +239,6 @@ Initialize(int argc, char **argv)
 #ifdef USER_PROGRAM
     Debugger *d = debugUserProg ? new Debugger : nullptr;
     machine = new Machine(d);  // This must come first.
-    pagesInUse = new Bitmap(NUM_PHYS_PAGES);
-    threads = new Table<Thread *>();
     SetExceptionHandlers();
 #endif
 
