@@ -211,7 +211,7 @@ Thread::ChangePriority(unsigned int newPriority)
 void
 Thread::RestorePriority()
 {
-    if (priorityBackup > HIGHER_PRIORITY ) {
+    if (priorityBackup <= HIGHER_PRIORITY ) {
         scheduler->ChangePriority(this, priorityBackup);
 
         priority = priorityBackup;

@@ -44,9 +44,9 @@ Lock::Acquire()
 {
     ASSERT (!IsHeldByCurrentThread());
 
-    // if (threadLocking != nullptr && threadLocking->GetPriority() > currentThread->GetPriority()) {
-    //   threadLocking->ChangePriority(currentThread->GetPriority());
-    // }
+    if (threadLocking != nullptr && threadLocking->GetPriority() < currentThread->GetPriority()) {
+      threadLocking->ChangePriority( currentThread->GetPriority());
+    }
 
     sem->P();
     threadLocking = currentThread;
@@ -57,7 +57,7 @@ Lock::Release()
 {
     ASSERT (IsHeldByCurrentThread());
 
-    // if (threadLocking != nullptr) { threadLocking->RestorePriority(); }
+    if (threadLocking != nullptr) { threadLocking->RestorePriority(); }
 
     threadLocking = nullptr;
     sem->V();
