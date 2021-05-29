@@ -32,6 +32,7 @@ Statistics *stats;            ///< Performance metrics.
 Timer *timer;                 ///< The hardware timer device, for invoking
                               ///< context switches.
 
+
 // 2007, Jose Miguel Santos Espino
 PreemptiveScheduler *preemptiveScheduler = nullptr;
 const long long DEFAULT_TIME_SLICE = 50000;
@@ -42,13 +43,13 @@ FileSystem *fileSystem;
 
 #ifdef FILESYS
 SynchDisk *synchDisk;
-SynchConsole *synchConsole;
 #endif
 
 #ifdef USER_PROGRAM  // Requires either *FILESYS* or *FILESYS_STUB*.
 Machine *machine;  ///< User program memory and registers.
 Bitmap *pagesInUse;
 Table<Thread *> *threads;
+SynchConsole *synchConsole;
 #endif
 
 #ifdef NETWORK
@@ -240,11 +241,11 @@ Initialize(int argc, char **argv)
     Debugger *d = debugUserProg ? new Debugger : nullptr;
     machine = new Machine(d);  // This must come first.
     SetExceptionHandlers();
+    synchConsole = new SynchConsole();
 #endif
 
 #ifdef FILESYS
     synchDisk = new SynchDisk("DISK");
-    synchConsole = new SynchConsole();
 #endif
 
 #ifdef FILESYS_NEEDED
@@ -273,6 +274,7 @@ Cleanup()
     delete machine;
     delete pagesInUse;
     delete threads;
+    delete synchConsole;
 #endif
 
 #ifdef FILESYS_NEEDED
@@ -281,7 +283,6 @@ Cleanup()
 
 #ifdef FILESYS
     delete synchDisk;
-    delete synchConsole;
 #endif
 
     delete timer;

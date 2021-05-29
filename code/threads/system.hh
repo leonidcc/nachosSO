@@ -17,6 +17,8 @@
 #include "machine/timer.hh"
 #include "lib/bitmap.hh"
 
+#include "filesys/synch_console.hh"
+extern SynchConsole *synchConsole;
 /// Initialization and cleanup routines.
 
 // Initialization, called before anything else.
@@ -48,8 +50,7 @@ extern FileSystem *fileSystem;
 #ifdef FILESYS
 #include "filesys/synch_disk.hh"
 extern SynchDisk *synchDisk;
-#include "filesys/synch_console.hh"
-extern SynchConsole *synchConsole;
+
 #endif
 
 #ifdef NETWORK

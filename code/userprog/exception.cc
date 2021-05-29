@@ -156,7 +156,7 @@ SyscallHandler(ExceptionType _et)
                 DEBUG('e', "Invalid filename");
                 machine->WriteRegister(2, -1);
                 break;
-            }            
+            }
             OpenFile *exe = fileSystem->Open(file_name);
             if(exe == nullptr) {
                 DEBUG('e', "File cannot be opened");
@@ -210,11 +210,11 @@ SyscallHandler(ExceptionType _et)
 
                  if (fid == CONSOLE_OUTPUT) {
                      DEBUG('e', "`Write` requested to console output.\n");
-                    //  for (; bytesWritten < size; bytesWritten++) {
-                    //     char ch = tempString[bytesWritten];
-                    //     synchConsole->WriteChar(ch);
-                    // }
-                     machine->WriteRegister(2, -1);
+                     for (; bytesWritten < size; bytesWritten++) {
+                        char ch = tempString[bytesWritten];
+                        synchConsole->WriteChar(ch);
+                    }
+                     // machine->WriteRegister(2, -1);
                  }
                  else {
                      DEBUG('e', "`Write` requested to file with id %u.\n", fid);
@@ -261,14 +261,14 @@ SyscallHandler(ExceptionType _et)
             if(id == CONSOLE_INPUT ){
                 DEBUG('e', "`Read` requested from console input.\n");
                 // implementar leer de la conssola
-                // for (; bytesRead < size; bytesRead++) {
-                //     char ch = synchConsole->ReadChar();
-                //     tempString[bytesRead] = ch;
-                //     if (ch == '\n')
-                //         break;
-                // }
-                // tempString[bytesRead+1] = '\0';
-                machine->WriteRegister(2, -1);
+                for (; bytesRead < size; bytesRead++) {
+                    char ch = synchConsole->ReadChar();
+                    temp[bytesRead] = ch;
+                    if (ch == '\n')
+                        break;
+                }
+                temp[bytesRead+1] = '\0';
+                // machine->WriteRegister(2, -1);
             }
             else{
                 DEBUG('e', "`Read` requested from file with id %u.\n", id);
