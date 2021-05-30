@@ -16,7 +16,7 @@
 
 #include "filesys/file_system.hh"
 #include "machine/translation_entry.hh"
-
+#include "executable.hh"
 
 const unsigned USER_STACK_SIZE = 1024;  ///< Increase this as necessary!
 
@@ -48,6 +48,9 @@ public:
     void RestoreState();
 
 private:
+
+    void ReadDataBlock(Executable exe, char *main_mem, uint32_t size);
+    void ReadCodeBlock(Executable exe, char *main_mem, uint32_t size);
 
     /// Assume linear page table translation for now!
     TranslationEntry *pageTable;

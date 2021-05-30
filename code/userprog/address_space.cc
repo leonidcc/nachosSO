@@ -7,11 +7,32 @@
 
 
 #include "address_space.hh"
-#include "executable.hh"
 #include "threads/system.hh"
 #include <string.h>
 
+void
+AddressSpace::ReadDataBlock(Executable exe, char *main_mem, uint32_t size)
+{
+    uint32_t virtualAddr = exe.GetInitDataAddr();
+    for (uint32_t i = 0; i < size; i++) {
+        uint32_t frame = pageTable[DivRoundDown(virtualAddr + i, PAGE_SIZE)].physicalPage;
+        uint32_t offset = (virtualAddr + i) % PAGE_SIZE;
+        uint32_t physicalAddr = frame * PAGE_SIZE + offset;
+        exe.ReadDataBlock(&main_mem[physicalAddr], 1, i);
+    }
+}
 
+void
+AddressSpace::ReadCodeBlock(Executable exe, char *main_mem, uint32_t size)
+{
+    uint32_t virtualAddr = exe.GetInitDataAddr();
+    for (uint32_t i = 0; i < size; i++) {
+        uint32_t frame = pageTable[DivRoundDown(virtualAddr + i, PAGE_SIZE)].physicalPage;
+        uint32_t offset = (virtualAddr + i) % PAGE_SIZE;
+        uint32_t physicalAddr = frame * PAGE_SIZE + offset;
+        exe.ReadCodeBlock(&main_mem[physicalAddr], 1, i);
+    }
+}
 /// First, set up the translation from program memory to physical memory.
 /// For now, this is really simple (1:1), since we are only uniprogramming,
 /// and we have a single unsegmented page table.
@@ -38,7 +59,9 @@ AddressSpace::AddressSpace(OpenFile *executable_file)
 
     // First, set up the translation.
 
+
     pageTable = new TranslationEntry[numPages];
+    char *mainMemory = machine->GetMMU()->mainMemory;
     for (unsigned i = 0; i < numPages; i++) {
         pageTable[i].virtualPage  = i;
         // For now, virtual page number = physical page number.
@@ -47,30 +70,26 @@ AddressSpace::AddressSpace(OpenFile *executable_file)
         pageTable[i].use          = false;
         pageTable[i].dirty        = false;
         pageTable[i].readOnly     = false;
-          // If the code segment was entirely on a separate page, we could
-          // set its pages to be read-only.
+        // If the code segment was entirely on a separate page, we could
+        // set its pages to be read-only.
+        // Zero out the entire address space, to zero the unitialized data
+        // segment and the stack segment.
+        memset(mainMemory + pageTable[i].physicalPage * PAGE_SIZE, 0, PAGE_SIZE); 
     }
-
-    char *mainMemory = machine->GetMMU()->mainMemory;
-
-    // Zero out the entire address space, to zero the unitialized data
-    // segment and the stack segment.
-    memset(mainMemory, 0, size);
 
     // Then, copy in the code and data segments into memory.
     uint32_t codeSize = exe.GetCodeSize();
     uint32_t initDataSize = exe.GetInitDataSize();
     if (codeSize > 0) {
-        uint32_t virtualAddr = exe.GetCodeAddr();
         DEBUG('a', "Initializing code segment, at 0x%X, size %u\n",
-              virtualAddr, codeSize);
-        exe.ReadCodeBlock(&mainMemory[virtualAddr], codeSize, 0);
+              exe.GetInitDataAddr(), codeSize);
+        ReadCodeBlock(exe, mainMemory, codeSize);
     }
     if (initDataSize > 0) {
-        uint32_t virtualAddr = exe.GetInitDataAddr();
+        
         DEBUG('a', "Initializing data segment, at 0x%X, size %u\n",
-              virtualAddr, initDataSize);
-        exe.ReadDataBlock(&mainMemory[virtualAddr], initDataSize, 0);
+              exe.GetInitDataAddr(), initDataSize);
+        ReadDataBlock(exe, mainMemory, initDataSize);
     }
 
 }
