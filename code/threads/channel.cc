@@ -38,10 +38,13 @@ void Channel::Receive(int *msg){
     while(!ready)
         empty->Wait();
 
+    ASSERT(msg);
     *msg = buff;
     ready = false;
 
     receive->Signal();
+    DEBUG('t', "Channel Antes send->Wait ");
     send->Wait();
+    DEBUG('t', "Channel Despues send->Wait");
     lock->Release();
 }

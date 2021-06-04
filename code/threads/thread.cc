@@ -186,8 +186,8 @@ Thread::Finish()
 
 void
 Thread::Join(){
-    int *fin = 0;
-    if(channel) channel->Receive(fin);
+    int  fin = 0;
+    if(channel) channel->Receive(&fin);
 }
 
 unsigned int

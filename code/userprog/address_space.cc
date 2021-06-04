@@ -25,7 +25,7 @@ AddressSpace::ReadDataBlock(Executable exe, char *main_mem, uint32_t size)
 void
 AddressSpace::ReadCodeBlock(Executable exe, char *main_mem, uint32_t size)
 {
-    uint32_t virtualAddr = exe.GetInitDataAddr();
+    uint32_t virtualAddr = exe.GetCodeAddr();
     for (uint32_t i = 0; i < size; i++) {
         uint32_t frame = pageTable[DivRoundDown(virtualAddr + i, PAGE_SIZE)].physicalPage;
         uint32_t offset = (virtualAddr + i) % PAGE_SIZE;
@@ -74,7 +74,7 @@ AddressSpace::AddressSpace(OpenFile *executable_file)
         // set its pages to be read-only.
         // Zero out the entire address space, to zero the unitialized data
         // segment and the stack segment.
-        memset(mainMemory + pageTable[i].physicalPage * PAGE_SIZE, 0, PAGE_SIZE); 
+        memset(mainMemory + pageTable[i].physicalPage * PAGE_SIZE, 0, PAGE_SIZE);
     }
 
     // Then, copy in the code and data segments into memory.
@@ -86,7 +86,7 @@ AddressSpace::AddressSpace(OpenFile *executable_file)
         ReadCodeBlock(exe, mainMemory, codeSize);
     }
     if (initDataSize > 0) {
-        
+
         DEBUG('a', "Initializing data segment, at 0x%X, size %u\n",
               exe.GetInitDataAddr(), initDataSize);
         ReadDataBlock(exe, mainMemory, initDataSize);

@@ -167,6 +167,7 @@ SyscallHandler(ExceptionType _et)
             AddressSpace *space = new AddressSpace(exe);
             t->space = space;
             delete exe;
+            DEBUG('e', "Fork sobre thread %s", file_name);
             t->Fork(InitProcess, nullptr);
             machine->WriteRegister(2, t->PID);
             break;
@@ -268,7 +269,9 @@ SyscallHandler(ExceptionType _et)
                         break;
                 }
                 temp[bytesRead+1] = '\0';
+                DEBUG('e', "Se lee %s", temp);
                 // machine->WriteRegister(2, -1);
+                WriteStringToUser(temp, bufferPointer);
             }
             else{
                 DEBUG('e', "`Read` requested from file with id %u.\n", id);
@@ -289,6 +292,7 @@ SyscallHandler(ExceptionType _et)
                     break;
                 }
             }
+
             break;
         }
 
