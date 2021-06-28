@@ -15,7 +15,7 @@ public:
 
 private:
     bool ready;
-    int buff;
+    int* buff;
     Lock* lock;
 
     Condition* send;

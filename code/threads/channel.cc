@@ -2,12 +2,11 @@
 
 Channel::Channel(){
 
-    buff = NULL;
+    buff = nullptr;
     ready = false;
     lock = new Lock("Lock");
     send = new Condition("Send channel", lock);
     receive = new Condition("Receive channel", lock);
-    empty = new Condition("Empty info", lock);
 }
 
 Channel::~Channel(){
@@ -15,7 +14,6 @@ Channel::~Channel(){
     delete lock;
     delete send;
     delete receive;
-    delete empty;
 }
 
 void Channel::Send(int msg){
@@ -24,11 +22,11 @@ void Channel::Send(int msg){
     while(ready)
         receive->Wait();
 
-    buff = msg;
+    *buff = msg;
     ready = true;
 
     send->Signal();
-    empty->Signal();
+
     lock->Release();
 }
 
@@ -36,15 +34,13 @@ void Channel::Receive(int *msg){
 
     lock->Acquire();
     while(!ready)
-        empty->Wait();
+        send->Wait();
 
     ASSERT(msg);
-    *msg = buff;
+    msg = buff;
     ready = false;
 
     receive->Signal();
-    DEBUG('t', "Channel Antes send->Wait ");
-    send->Wait();
-    DEBUG('t', "Channel Despues send->Wait");
+
     lock->Release();
 }
